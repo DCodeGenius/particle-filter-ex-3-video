@@ -43,8 +43,13 @@ def predict_particles(s_prior: np.ndarray) -> np.ndarray:
     """
     s_prior = s_prior.astype(float)
     state_drifted = s_prior
-    """ DELETE THE LINE ABOVE AND:
-    INSERT YOUR CODE HERE."""
+    state_drifted[0, :] += state_drifted[4, :]  # x_c += vx
+    state_drifted[1, :] += state_drifted[5, :]  # y_c += vy
+    #Adding noise:
+    # Add Gaussian noise to all components
+    std = np.array([5, 5, 1, 1, 1, 1])[:, np.newaxis]
+    noise = np.random.normal(0, std, size=S.shape)
+    state_drifted += noise
     state_drifted = state_drifted.astype(int)
     return state_drifted
 
