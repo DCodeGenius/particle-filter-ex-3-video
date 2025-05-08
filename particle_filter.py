@@ -48,7 +48,7 @@ def predict_particles(s_prior: np.ndarray) -> np.ndarray:
     #Adding noise:
     # Add Gaussian noise to all components
     std = np.array([5, 5, 1, 1, 1, 1])[:, np.newaxis]
-    noise = np.random.normal(0, std, size=S.shape)
+    noise = np.random.normal(0, std, size=s_prior.shape)
     state_drifted += noise
     state_drifted = state_drifted.astype(int)
     return state_drifted
