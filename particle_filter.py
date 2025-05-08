@@ -108,8 +108,9 @@ def bhattacharyya_distance(p: np.ndarray, q: np.ndarray) -> float:
         distance: float. The Bhattacharyya Distance.
     """
     distance = 0
-    """ DELETE THE LINE ABOVE AND:
-        INSERT YOUR CODE HERE."""
+   # Normalize histograms
+    p = p/sum(p)
+    q = q/sum(q)
     return distance
 
 
