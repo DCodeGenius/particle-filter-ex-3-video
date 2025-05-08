@@ -172,7 +172,16 @@ def main():
 
     # COMPUTE NORMALIZED WEIGHTS (W) AND PREDICTOR CDFS (C)
     # YOU NEED TO FILL THIS PART WITH CODE:
-    """INSERT YOUR CODE HERE."""
+    W = np.zeros((N , 1))
+    C = np.zeros((N , 1))
+
+    for i in range(N):
+        p = compute_normalized_histogram(image, S[:,i:i+1])
+        W[i] = bhattacharyya_distance(p, q)
+        W /= np.sum(W) # normalize weights
+        C[i] = np.sum(W[:i])
+
+
 
     images_processed = 1
 
