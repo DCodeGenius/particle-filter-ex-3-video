@@ -191,13 +191,13 @@ def main():
     # COMPUTE NORMALIZED WEIGHTS (W) AND PREDICTOR CDFS (C)
     # YOU NEED TO FILL THIS PART WITH CODE:
     W = np.zeros((N , 1))
-    C = np.zeros((N , 1))
 
     for i in range(N):
         p = compute_normalized_histogram(image, S[:,i:i+1])
         W[i] = bhattacharyya_distance(p, q)
-        W /= np.sum(W) # normalize weights
-        C[i] = np.sum(W[:i])
+    W = W.flatten()
+    W /= np.sum(W) # normalize weights
+    C = np.cumsum(W)
 
 
 
@@ -224,7 +224,13 @@ def main():
 
         # COMPUTE NORMALIZED WEIGHTS (W) AND PREDICTOR CDFS (C)
         # YOU NEED TO FILL THIS PART WITH CODE:
-        """INSERT YOUR CODE HERE."""
+        W = np.zeros((N, 1))
+        for i in range(N):
+            p = compute_normalized_histogram(current_image, S[:, i:i+1])
+            W[i] = bhattacharyya_distance(p, q)
+        W = W.flatten()
+        W /= np.sum(W)
+        C = np.cumsum(W)
 
         # CREATE DETECTOR PLOTS
         images_processed += 1
