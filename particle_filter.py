@@ -27,7 +27,7 @@ s_initial = [297,    # x center
                0,    # velocity x
                0]    # velocity y
 s_initial = np.array(s_initial).reshape((6, 1))  # make it a column vector
-S = s_initial + np.random.normal(0, [5, 5, 1, 1, 2, 2], size=(6, N))
+S = s_initial + np.random.normal(0, [5, 5, 1, 1, 2, 2], size=(6, N)) #TODO check values in [5, 5, 1, 1, 2, 2]
 
 
 def predict_particles(s_prior: np.ndarray) -> np.ndarray:
@@ -143,18 +143,25 @@ def show_particles(image: np.ndarray, state: np.ndarray, W: np.ndarray, frame_in
     plt.title(ID + " - Frame mumber = " + str(frame_index))
 
     # Avg particle box
-    (x_avg, y_avg, w_avg, h_avg) = (0, 0, 0, 0)
-    """ DELETE THE LINE ABOVE AND:
-        INSERT YOUR CODE HERE."""
+    s_avg = np.sum(state * W.reshape(1, -1), axis=1)  # shape (6,)
+    x_avg, y_avg, w_avg, h_avg = s_avg[:4]
+    x_avg -= w_avg #converting x,y to top left corner and not center
+    y_avg -= h_avg
+    w_avg *= 2 #converting w,h from halves to whole
+    h_avg *= 2
 
 
     rect = patches.Rectangle((x_avg, y_avg), w_avg, h_avg, linewidth=1, edgecolor='g', facecolor='none')
     ax.add_patch(rect)
 
     # calculate Max particle box
-    (x_max, y_max, w_max, h_max) = (0, 0, 0, 0)
-    """ DELETE THE LINE ABOVE AND:
-        INSERT YOUR CODE HERE."""
+    i_max = np.argmax(W)
+    s_max = state[:, i_max]
+    x_max, y_max, w_max, h_max = s_max[:4]
+    x_max -= w_max #converting x,y to top left corner and not center
+    y_max -= h_max
+    w_max *= 2 #converting w,h from halves to whole
+    h_max *= 2
 
     rect = patches.Rectangle((x_max, y_max), w_max, h_max, linewidth=1, edgecolor='r', facecolor='none')
     ax.add_patch(rect)
