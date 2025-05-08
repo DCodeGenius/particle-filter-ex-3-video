@@ -38,27 +38,53 @@ S = np.tile(s_initial, (1, N)) + np.random.normal(0, noise_std_initial, size=(6,
 def predict_particles(s_prior: np.ndarray) -> np.ndarray:
     """Progress the prior state with time and add noise.
 
+    Can handle s_prior in two formats:
+    1. (6, N): Standard format where N is number of particles, each column is a particle.
+    2. (1, 6*N): Flattened format, which will be internally reshaped to (6, N).
+
     Note that we explicitly did not tell you how to add the noise.
     We allow additional manipulations to the state if you think these are necessary.
 
     Args:
         s_prior: np.ndarray. The prior state.
     Return:
-        state_drifted: np.ndarray. The prior state after drift (applying the motion model) and adding the noise.
+        state_drifted: np.ndarray. The prior state after drift and noise, in (6, N) format.
     """
-    s_prior = s_prior.astype(float)
-    state_drifted = s_prior.copy()
+    
+    num_particles = 0
+    state_for_processing = None
+
+    if s_prior.shape[0] == 6: # Standard (6, N) format
+        state_for_processing = s_prior.copy() # Use a copy
+        num_particles = s_prior.shape[1]
+    elif s_prior.shape[0] == 1 and s_prior.shape[1] > 0 and s_prior.shape[1] % 6 == 0: # Flattened (1, 6*N) format
+        num_particles = s_prior.shape[1] // 6
+        # Reshape from (1, 6*N) to (6, N).
+        # Original (1, 6N) is [x0,y0,w0,h0,vx0,vy0, x1,y1,w1,h1,vx1,vy1, ...]
+        # Reshaping to (num_particles, 6) makes each row a particle's state.
+        # Transposing then makes each column a particle's state.
+        state_for_processing = s_prior.reshape(num_particles, 6).T
+    else:
+        raise ValueError(
+            f"Unsupported s_prior shape: {s_prior.shape}. "
+            f"Expected (6, N) or (1, 6*N where 6*N is total elements)."
+        )
+
+    state_for_processing = state_for_processing.astype(float)
+    state_drifted = state_for_processing # Now guaranteed to be (6, num_particles)
+
     state_drifted[0, :] += state_drifted[4, :]  # x_c += vx
     state_drifted[1, :] += state_drifted[5, :]  # y_c += vy
     
     # Adding noise:
     # Add Gaussian noise to all components
+    # std should be (6,1) for broadcasting with (6, num_particles)
     std = np.array([5, 5, 1, 1, 1, 1])[:, np.newaxis]
-    noise = np.random.normal(0, std, size=s_prior.shape)
+    noise = np.random.normal(0, std, size=(6, num_particles)) # Noise shape is (6, num_particles)
     state_drifted += noise
     
     # Keep state as float to preserve precision
-    return state_drifted
+    return state_drifted # Returns in (6, N) format
 
 
 def compute_normalized_histogram(image: np.ndarray, state: np.ndarray) -> np.ndarray:
@@ -231,12 +257,13 @@ def show_particles(image: np.ndarray, state: np.ndarray, W: np.ndarray, frame_in
 
 
 def main():
-    # Ensure state_at_first_frame is (6,N)
-    # s_initial is (6,1). repmat(s_initial, 1, N) repeats it N times horizontally.
-    #state_at_first_frame = np.matlib.repmat(s_initial, N, 1).T
-
-    state_at_first_frame = np.matlib.repmat(s_initial, 1, N)
-    S = predict_particles(state_at_first_frame)
+    # Ensure state_at_first_frame is (6,N) or (1, 6*N) as predict_particles can now handle both.
+    # s_initial is (6,1).
+    # Original request was to keep this .T version:
+    # repmat(s_initial, N, 1) creates (6N, 1), .T makes it (1, 6N)
+    state_at_first_frame = np.matlib.repmat(s_initial, N, 1).T
+    
+    S = predict_particles(state_at_first_frame) # predict_particles will reshape this to (6,N)
 
     # LOAD FIRST IMAGE
     image = cv2.imread(os.path.join(IMAGE_DIR_PATH, "001.png"))
