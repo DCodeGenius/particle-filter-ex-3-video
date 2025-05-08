@@ -26,6 +26,8 @@ s_initial = [297,    # x center
               43,    # half height
                0,    # velocity x
                0]    # velocity y
+s_initial = np.array(s_initial).reshape((6, 1))  # make it a column vector
+S = s_initial + np.random.normal(0, [5, 5, 1, 1, 2, 2], size=(6, N))
 
 
 def predict_particles(s_prior: np.ndarray) -> np.ndarray:
@@ -60,8 +62,21 @@ def compute_normalized_histogram(image: np.ndarray, state: np.ndarray) -> np.nda
     state = np.floor(state)
     state = state.astype(int)
     hist = np.zeros((16, 16, 16))
-    """ DELETE THE LINE ABOVE AND:
-        INSERT YOUR CODE HERE."""
+
+    #cropping patch of size (2*half width, 2*half height) centererd at the specified location by S
+    xc, yc, w, h = state[0, 0], state[1, 0], state[2, 0], state[3, 0]
+    x1, y1 = int(xc - w), int(yc - h)
+    x2, y2 = int(xc + w), int(yc + h)
+    patch = image[y1:y2, x1:x2, :]  # shape: (2h, 2w, 3)
+
+    # Quantize to 4-bit (values 0–15)
+    quantized = patch // 16
+
+    for pixel in quantized.reshape(-1, 3): # the reshape- to flatten quantized, each row noe a pixel
+        r, g, b = pixel
+        hist[r, g, b] += 1
+
+
     hist = np.reshape(hist, 16 * 16 * 16)
 
     # normalize
