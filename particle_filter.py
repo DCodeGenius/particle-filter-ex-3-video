@@ -126,6 +126,11 @@ def bhattacharyya_distance(p: np.ndarray, q: np.ndarray) -> float:
    # Normalize histograms
     p = p/sum(p)
     q = q/sum(q)
+
+    # Calculate the bhattacharyya coefficients:
+    # Equation is : dist(p,q) = exp(20*w=exp(20⋅ ∑square(P_i*Q_i))
+    distance = np.exp(20*np.sum(np.sqrt(p*q)))
+
     return distance
 
 
