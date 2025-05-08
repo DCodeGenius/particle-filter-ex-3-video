@@ -8,8 +8,8 @@ import matplotlib.patches as patches
 
 
 # change IDs to your IDs.
-ID1 = "123456789"
-ID2 = "987654321"
+ID1 = "207826314"
+ID2 = "208004119"
 
 ID = "HW3_{0}_{1}".format(ID1, ID2)
 RESULTS = 'results'
