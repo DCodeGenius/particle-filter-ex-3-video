@@ -97,9 +97,18 @@ def sample_particles(previous_state: np.ndarray, cdf: np.ndarray) -> np.ndarray:
     Return:
         s_next: np.ndarray. Sampled particles. shape: (6, N)
     """
-    S_next = np.zeros(previous_state.shape)
-    """ DELETE THE LINE ABOVE AND:
-        INSERT YOUR CODE HERE."""
+    N = previous_state.shape[1]
+    S_next = np.zeros_like(previous_state)
+
+    # Generate N random numbers between 0 and 1
+    r = np.random.rand(N)
+
+    # For each r, find the index j such that CDF[j] >= r[i]
+    indices = np.searchsorted(cdf, r)
+
+    # Use those indices to resample from previous_state
+    S_next = previous_state[:, indices]
+
     return S_next
 
 
