@@ -85,7 +85,7 @@ def compute_normalized_histogram(image: np.ndarray, state: np.ndarray) -> np.nda
     hist = np.reshape(hist, 16 * 16 * 16)
 
     # normalize
-    hist = hist/sum(hist)
+    hist = hist/np.sum(hist)
 
     return hist
 
