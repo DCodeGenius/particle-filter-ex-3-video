@@ -85,6 +85,8 @@ def predict_particles(s_prior: np.ndarray) -> np.ndarray:
     
     # Keep state as float to preserve precision
     return state_drifted # Returns in (6, N) format
+    
+
 
 
 def compute_normalized_histogram(image: np.ndarray, state: np.ndarray) -> np.ndarray:
